@@ -4,8 +4,9 @@ An unsupervised machine learning service that analyzes OTT viewer engagement pat
 
 ![REFLIX Web Interface](docs/screenshots/reflix-home.png)
 
-> **🌐 Live Website**: [https://4df8272bf27861.lhr.life/](https://4df8272bf27861.lhr.life/)  
-> **📦 GitHub Repository**: [https://github.com/benedictcgabriel-bit/reflix-audience-intelligence](https://github.com/benedictcgabriel-bit/reflix-audience-intelligence)
+> **🌐 GitHub Pages Live Link**: [https://benedictcgabriel-bit.github.io/reflix-audience-intelligence/](https://benedictcgabriel-bit.github.io/reflix-audience-intelligence/)  
+> **📦 GitHub Repository**: [https://github.com/benedictcgabriel-bit/reflix-audience-intelligence](https://github.com/benedictcgabriel-bit/reflix-audience-intelligence)  
+> **⚡ Live Container Tunnel**: [https://4df8272bf27861.lhr.life/](https://4df8272bf27861.lhr.life/)
 
 ---
 

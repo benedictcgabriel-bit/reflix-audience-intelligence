@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --default-timeout=100 --retries=10 --no-cache-dir -r requirements.txt
 
-COPY app.py .
+COPY app.py favicon.png apple-touch-icon.png logo.png ./
 
 USER appuser
 

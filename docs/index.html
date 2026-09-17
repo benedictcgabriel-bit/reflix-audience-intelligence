@@ -1,257 +1,4 @@
-import os
-import csv
-import json
-import logging
-from typing import List, Optional
-from contextlib import asynccontextmanager
-
-import numpy as np
-import joblib
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
-from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, Field, field_validator
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("api")
-
-MODEL_ARTIFACT = None
-
-def get_model_path():
-    candidates = [
-        "/models/model_artifact.joblib",
-        "models/model_artifact.joblib",
-        "../models/model_artifact.joblib",
-        "/Users/benedictcgabriel/.gemini/antigravity/scratch/audience-segmentation-service/models/model_artifact.joblib"
-    ]
-    for p in candidates:
-        if os.path.isfile(p):
-            return p
-    return None
-
-def find_data_file():
-    candidates = [
-        "/data/users.csv",
-        "data/users.csv",
-        "../data/users.csv",
-        "/Users/benedictcgabriel/.gemini/antigravity/scratch/audience-segmentation-service/data/users.csv"
-    ]
-    for p in candidates:
-        if os.path.isfile(p):
-            return p
-    return None
-
-def find_metrics_file():
-    candidates = [
-        "/results/metrics.json",
-        "results/metrics.json",
-        "../results/metrics.json",
-        "/Users/benedictcgabriel/.gemini/antigravity/scratch/audience-segmentation-service/results/metrics.json"
-    ]
-    for p in candidates:
-        if os.path.isfile(p):
-            return p
-    return None
-
-def load_artifact():
-    global MODEL_ARTIFACT
-    path = get_model_path()
-    if path:
-        try:
-            MODEL_ARTIFACT = joblib.load(path)
-            logger.info("Loaded model artifact from %s", path)
-            return True
-        except Exception as e:
-            logger.error("Failed to load model artifact: %s", e)
-            MODEL_ARTIFACT = None
-            return False
-    else:
-        logger.warning("No model artifact found.")
-        MODEL_ARTIFACT = None
-        return False
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    load_artifact()
-    yield
-
-app = FastAPI(
-    title="REFLIX: Containerized Audience Segmentation & Personalization Service",
-    description="Unsupervised clustering and content recommendation engine for OTT viewer behavior.",
-    version="1.0.0",
-    lifespan=lifespan
-)
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    errors = []
-    for err in exc.errors():
-        field = " -> ".join(str(loc) for loc in err.get("loc", []))
-        errors.append({"field": field, "message": err.get("msg"), "type": err.get("type")})
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"status": "error", "error_type": "ValidationError", "details": errors}
-    )
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"status": "error", "message": exc.detail}
-    )
-
-@app.exception_handler(Exception)
-async def unhandled_exception_handler(request: Request, exc: Exception):
-    logger.error("Unhandled error: %s", exc)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"status": "error", "message": "Internal server processing error"}
-    )
-
-class RecommendRequest(BaseModel):
-    user_id: str = Field(..., min_length=1, description="Unique user identifier", examples=["USR-8192"])
-    watch_time_hours: float = Field(..., ge=0.0, le=10000.0, description="Total watch time in hours", examples=[32.5])
-    top_genres: Optional[List[str]] = Field(default_factory=list, description="List of preferred genres", examples=[["Action", "Thriller"]])
-    avg_session_mins: float = Field(..., ge=0.0, le=1440.0, description="Average session duration in minutes", examples=[85.0])
-
-    @field_validator("user_id")
-    @classmethod
-    def validate_user_id(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("user_id must not be empty or blank")
-        return v.strip()
-
-class RecommendResponse(BaseModel):
-    user_id: str
-    segment_id: int
-    segment_name: str
-    recommendations: List[str]
-    distance_to_centroid: float
-
-class HealthResponse(BaseModel):
-    status: str
-    model_loaded: bool
-
-@app.get("/health", response_model=HealthResponse)
-def health():
-    global MODEL_ARTIFACT
-    if MODEL_ARTIFACT is None:
-        load_artifact()
-    
-    if MODEL_ARTIFACT is not None:
-        return {"status": "ok", "model_loaded": True}
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "not_ready", "model_loaded": False}
-        )
-
-@app.post("/recommend", response_model=RecommendResponse)
-def recommend(payload: RecommendRequest):
-    global MODEL_ARTIFACT
-    if MODEL_ARTIFACT is None:
-        if not load_artifact():
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Model artifact is not loaded. Ensure trainer has run successfully."
-            )
-
-    scaler = MODEL_ARTIFACT["scaler"]
-    kmeans = MODEL_ARTIFACT["kmeans"]
-    known_genres = MODEL_ARTIFACT["known_genres"]
-    segments = MODEL_ARTIFACT["segments"]
-
-    num_vals = np.array([[payload.watch_time_hours, payload.avg_session_mins]], dtype=np.float64)
-
-    genre_encoded = np.zeros((1, len(known_genres)), dtype=np.float64)
-    if payload.top_genres:
-        valid_genres = [g.strip() for g in payload.top_genres if isinstance(g, str) and g.strip() in known_genres]
-        if valid_genres:
-            weight = 1.0 / len(valid_genres)
-            for g in valid_genres:
-                idx = known_genres.index(g)
-                genre_encoded[0, idx] = weight
-
-    X = np.hstack([num_vals, genre_encoded])
-    target_dtype = getattr(kmeans, "cluster_centers_", np.array([])).dtype
-    if target_dtype != np.dtype("float32") and target_dtype != np.dtype("float64"):
-        target_dtype = np.float32
-    X_scaled = scaler.transform(X).astype(target_dtype)
-
-    cluster_id = int(kmeans.predict(X_scaled)[0])
-
-    centroid = kmeans.cluster_centers_[cluster_id]
-    dist = float(np.linalg.norm(X_scaled[0] - centroid))
-
-    segment_info = segments.get(cluster_id) or segments.get(str(cluster_id))
-    if not segment_info:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Segment profile for cluster ID {cluster_id} not found."
-        )
-
-    return RecommendResponse(
-        user_id=payload.user_id,
-        segment_id=cluster_id,
-        segment_name=segment_info["segment_name"],
-        recommendations=segment_info["recommendations"],
-        distance_to_centroid=round(dist, 2)
-    )
-
-@app.get("/segments")
-def get_segments():
-    if MODEL_ARTIFACT is None and not load_artifact():
-        raise HTTPException(status_code=503, detail="Model artifact not loaded.")
-    return {
-        "metrics": MODEL_ARTIFACT.get("metrics"),
-        "segments": MODEL_ARTIFACT.get("segments")
-    }
-
-@app.get("/metrics")
-def get_metrics():
-    mf = find_metrics_file()
-    if mf:
-        try:
-            with open(mf, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    if MODEL_ARTIFACT is not None and "metrics" in MODEL_ARTIFACT:
-        m = MODEL_ARTIFACT["metrics"]
-        return {
-            "clustering": {
-                "algorithm": m.get("algorithm", "KMeans"),
-                "selected_k": m.get("selected_k", 4),
-                "silhouette_score": m.get("silhouette_score", 0.0),
-                "inertia": m.get("inertia", 0.0)
-            },
-            "cluster_balance": m.get("cluster_balance", {}),
-            "stability": {"fixed_seed": True, "repeat_consistency": True},
-            "api": {"health_passed": True, "valid_requests_passed": 4},
-            "robustness": {"edge_cases_passed": 10, "edge_cases_total": 10},
-            "reproducibility": {"clean_compose_run": True}
-        }
-    raise HTTPException(status_code=404, detail="Metrics not yet available.")
-
-@app.get("/favicon.png")
-@app.get("/favicon.ico")
-def get_favicon():
-    for p in ["favicon.png", "api/favicon.png", "docs/favicon.png", "/app/favicon.png"]:
-        if os.path.exists(p):
-            return FileResponse(p, media_type="image/png")
-    raise HTTPException(status_code=404)
-
-@app.get("/apple-touch-icon.png")
-def get_touch_icon():
-    for p in ["apple-touch-icon.png", "api/apple-touch-icon.png", "docs/apple-touch-icon.png", "/app/apple-touch-icon.png"]:
-        if os.path.exists(p):
-            return FileResponse(p, media_type="image/png")
-    raise HTTPException(status_code=404)
-
-@app.get("/", response_class=HTMLResponse)
-@app.get("/ui", response_class=HTMLResponse)
-def serve_ui():
-    return """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1058,12 +805,96 @@ def serve_ui():
       document.getElementById("movie-modal").classList.add("hidden");
     }
 
+    
+    // ==========================================================
+    // CLIENT-SIDE MACHINE LEARNING ENGINE (FOR GITHUB PAGES)
+    // ==========================================================
+    const SCALER_MEAN = [30.06551207327231, 65.85592839300588, 0.09450457951706911, 0.15091590341382183, 0.14300582847626978, 0.08076602830974189, 0.08680266444629475, 0.08222314737718568, 0.12614487926727727, 0.12364696086594505, 0.054329725228975854, 0.056827643630308074];
+    const SCALER_SCALE = [14.655835706008991, 20.968441754619132, 0.24993542917131512, 0.3023244565435491, 0.29400582411264164, 0.23204139724756484, 0.24241331443160855, 0.2322024013680336, 0.28071374889464895, 0.2773558184915686, 0.19212208473902906, 0.19781595438357735];
+    const CLUSTER_CENTERS = [
+      [0.3213043136094447, 0.7619666041539879, 0.6878870512099929, 0.7412040003250611, 0.725206139858771, -0.34806732448508976, -0.3580771322310531, -0.3541011931520234, -0.44937193053062535, -0.44580626264995415, -0.2827875061983391, -0.28727533028056934],
+      [1.0822381549276783, 0.3999949879511903, -0.3781159791167186, -0.499185230130669, -0.4864047469395699, -0.3480673244850902, -0.3580771322310532, -0.35410119315202415, 1.3496136980269748, 1.3389048088253588, -0.2827875061983394, -0.2872753302805694],
+      [-1.324458447541615, -1.3920210222540395, -0.3781159791167187, -0.499185230130669, -0.48640474693956975, 1.0453621978702248, 1.0754249871339263, 1.063483916766579, -0.449371930530626, -0.4458062626499549, -0.28278750619833937, -0.2872753302805695],
+      [-0.36691171321968735, -0.15422836044998345, -0.3781159791167186, -0.09281009177184178, -0.0976855280919606, -0.34806732448508926, -0.35807713223105303, -0.3541011931520225, -0.44937193053062413, -0.44580626264995266, 1.6579427506256843, 1.6842542221020806]
+    ];
+    const STATIC_SEGMENTS = {
+      0: {
+        segment_id: 0,
+        segment_name: "High-Engagement Action Viewers",
+        description: "Users with high watch time and long sessions focused on action, thrillers, and blockbuster spectacles.",
+        cluster_size: 852,
+        key_features: { top_genres: ["Thriller", "Sci-Fi", "Action"] },
+        recommendations: ["Mad Max: Fury Road", "John Wick: Chapter 4", "The Dark Knight", "Inception"]
+      },
+      1: {
+        segment_id: 1,
+        segment_name: "Binge Drama & Romance Enthusiasts",
+        description: "Heavy streaming viewers who binge dramatic series, character-driven narratives, and romance sagas.",
+        cluster_size: 600,
+        key_features: { top_genres: ["Drama", "Romance"] },
+        recommendations: ["Succession", "Bridgerton", "The Crown", "Normal People"]
+      },
+      2: {
+        segment_id: 2,
+        segment_name: "Casual Comedy & Family Streamers",
+        description: "Casual viewers seeking lighthearted entertainment, family friendly programming, and bite-sized comedy sessions.",
+        cluster_size: 600,
+        key_features: { top_genres: ["Animation", "Family", "Comedy"] },
+        recommendations: ["Ted Lasso", "The Good Place", "Inside Out 2", "Parks and Recreation"]
+      },
+      3: {
+        segment_id: 3,
+        segment_name: "Late-Night Mystery & Sci-Fi Buffs",
+        description: "Niche viewers who favor mind-bending science fiction, psychological thrillers, and immersive late-night mysteries.",
+        cluster_size: 350,
+        key_features: { top_genres: ["Documentary", "Horror", "Thriller"] },
+        recommendations: ["Interstellar", "Dark", "Severance", "Black Mirror"]
+      }
+    };
+
+    function predictOffline(user_id, watch_time, avg_session, genres) {
+      const valid = genres.filter(g => ALL_GENRES.includes(g));
+      const w = valid.length > 0 ? 1.0 / valid.length : 0.0;
+      const genreVec = ALL_GENRES.map(g => valid.includes(g) ? w : 0.0);
+      const raw = [watch_time, avg_session, ...genreVec];
+      const scaled = raw.map((val, i) => (val - SCALER_MEAN[i]) / SCALER_SCALE[i]);
+
+      let bestK = 0;
+      let minDistance = Infinity;
+
+      CLUSTER_CENTERS.forEach((c, k) => {
+        let sumSq = 0;
+        for (let i = 0; i < 12; i++) {
+          sumSq += Math.pow(scaled[i] - c[i], 2);
+        }
+        const dist = Math.sqrt(sumSq);
+        if (dist < minDistance) {
+          minDistance = dist;
+          bestK = k;
+        }
+      });
+
+      const seg = STATIC_SEGMENTS[bestK];
+      return {
+        user_id: user_id,
+        segment_id: bestK,
+        segment_name: seg.segment_name,
+        recommendations: seg.recommendations,
+        distance_to_centroid: parseFloat(minDistance.toFixed(2))
+      };
+    }
+
     async function loadSegments() {
       try {
-        const res = await fetch("/segments");
-        if (!res.ok) return;
-        const data = await res.json();
-        segmentsData = data.segments || {};
+        let segs = null;
+        try {
+          const res = await fetch("/segments");
+          if (res.ok) {
+            const d = await res.json();
+            segs = d.segments;
+          }
+        } catch(e) {}
+        segmentsData = segs || STATIC_SEGMENTS;
         
         const grid = document.getElementById("segments-grid");
         grid.innerHTML = "";
@@ -1105,17 +936,26 @@ def serve_ui():
       btn.classList.add("opacity-75");
 
       try {
-        const res = await fetch("/recommend", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+        let data = null;
+        try {
+          const res = await fetch("/recommend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch(e) {}
+
+        if (!data) {
+          data = predictOffline(payload.user_id, payload.watch_time_hours, payload.avg_session_mins, payload.top_genres);
+        }
 
         btn.disabled = false;
         btn.classList.remove("opacity-75");
 
-        if (res.ok) {
-          const data = await res.json();
+        if (data) {
           document.getElementById("res-segment-name").textContent = data.segment_name;
           document.getElementById("res-distance").textContent = `Distance to centroid: ${data.distance_to_centroid.toFixed(2)}`;
           
@@ -1217,4 +1057,3 @@ def serve_ui():
   </script>
 </body>
 </html>
-"""
