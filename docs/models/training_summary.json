@@ -1,0 +1,137 @@
+{
+  "algorithm": "KMeans",
+  "selected_k": 4,
+  "silhouette_score": 0.3586,
+  "inertia": 15159.47,
+  "cluster_balance": {
+    "counts": {
+      "0": 852,
+      "1": 600,
+      "2": 600,
+      "3": 350
+    },
+    "min_cluster_size": 350,
+    "max_cluster_size": 852
+  },
+  "segments": {
+    "0": {
+      "segment_id": 0,
+      "segment_name": "High-Engagement Action Viewers",
+      "description": "Users with high watch time and long sessions focused on action, thrillers, and blockbuster spectacles.",
+      "cluster_size": 852,
+      "key_features": {
+        "mean_watch_time_hours": 34.77,
+        "mean_avg_session_mins": 81.83,
+        "top_genres": [
+          "Thriller",
+          "Sci-Fi",
+          "Action"
+        ]
+      },
+      "recommendation_strategy": "Recommend high-octane blockbusters, action-thriller sequels, and suspenseful releases.",
+      "recommendations": [
+        "Mad Max: Fury Road",
+        "John Wick: Chapter 4",
+        "The Dark Knight",
+        "Inception"
+      ]
+    },
+    "1": {
+      "segment_id": 1,
+      "segment_name": "Binge Drama & Romance Enthusiasts",
+      "description": "Heavy streaming viewers who binge dramatic series, character-driven narratives, and romance sagas.",
+      "cluster_size": 600,
+      "key_features": {
+        "mean_watch_time_hours": 45.93,
+        "mean_avg_session_mins": 74.24,
+        "top_genres": [
+          "Drama",
+          "Romance"
+        ]
+      },
+      "recommendation_strategy": "Recommend multi-season episodic dramas, romantic series, and critically acclaimed prestige releases.",
+      "recommendations": [
+        "Succession",
+        "Bridgerton",
+        "The Crown",
+        "Normal People"
+      ]
+    },
+    "2": {
+      "segment_id": 2,
+      "segment_name": "Casual Comedy & Family Streamers",
+      "description": "Casual viewers seeking lighthearted entertainment, family friendly programming, and bite-sized comedy sessions.",
+      "cluster_size": 600,
+      "key_features": {
+        "mean_watch_time_hours": 10.65,
+        "mean_avg_session_mins": 36.67,
+        "top_genres": [
+          "Animation",
+          "Family",
+          "Comedy"
+        ]
+      },
+      "recommendation_strategy": "Recommend feel-good comedies, animated features, and lighthearted ensemble sitcoms.",
+      "recommendations": [
+        "Ted Lasso",
+        "The Good Place",
+        "Inside Out 2",
+        "Parks and Recreation"
+      ]
+    },
+    "3": {
+      "segment_id": 3,
+      "segment_name": "Late-Night Mystery & Sci-Fi Buffs",
+      "description": "Niche viewers who favor mind-bending science fiction, psychological thrillers, and immersive late-night mysteries.",
+      "cluster_size": 350,
+      "key_features": {
+        "mean_watch_time_hours": 24.69,
+        "mean_avg_session_mins": 62.62,
+        "top_genres": [
+          "Documentary",
+          "Horror",
+          "Thriller"
+        ]
+      },
+      "recommendation_strategy": "Recommend speculative fiction, dark mystery miniseries, and critically acclaimed sci-fi.",
+      "recommendations": [
+        "Interstellar",
+        "Dark",
+        "Severance",
+        "Black Mirror"
+      ]
+    }
+  },
+  "k_evaluation": [
+    {
+      "k": 2,
+      "silhouette_score": 0.2899,
+      "inertia": 22214.51,
+      "inertia_delta": 0.0
+    },
+    {
+      "k": 3,
+      "silhouette_score": 0.3088,
+      "inertia": 18006.39,
+      "inertia_delta": 4208.12
+    },
+    {
+      "k": 4,
+      "silhouette_score": 0.3586,
+      "inertia": 15159.47,
+      "inertia_delta": 2846.92
+    },
+    {
+      "k": 5,
+      "silhouette_score": 0.3583,
+      "inertia": 13555.88,
+      "inertia_delta": 1603.6
+    },
+    {
+      "k": 6,
+      "silhouette_score": 0.3959,
+      "inertia": 11515.07,
+      "inertia_delta": 2040.81
+    }
+  ]
+}

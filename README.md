@@ -24,7 +24,7 @@ REFLIX solves this by applying unsupervised machine learning directly to viewer 
 - **Unsupervised Segmentation**: Uses a trained Scikit-Learn pipeline (`StandardScaler` + Multi-label Binarization + `KMeans`) to segment viewers into $K=4$ distinct clusters.
 - **Transparent Segment Profiles**: Assigns human-interpretable personas (e.g., *High-Engagement Action Viewers*, *Casual Comedy & Family Streamers*) with distance-to-centroid metrics.
 - **Personalized Recommendations**: Delivers ranked movie/show recommendations curated per audience cluster without external model hallucinations.
-- **Sample Viewer Scenarios**: Provides 8 distinct demo scenarios (Benedict, Maya, Arjun, Sofia, Noah, Priya, Leo, Aisha) with a clean toggleable interface.
+- **Audience Behavior Profiles**: Provides 4 canonical evaluation benchmark profiles (`USR-8192`, `USR-1044`, `USR-2099`, `USR-5512`) directly mapped to the learned audience clusters.
 - **Strict Data Validation**: Built on FastAPI and Pydantic v2 with comprehensive bounds checking and graceful error handling.
 - **Automated Quality Audit**: Standalone evaluator service verifies API readiness, benchmarks 4 canonical profiles, and exercises 10 mandatory edge cases.
 - **Fully Containerized**: Three-tier microservice architecture (`trainer`, `api`, `evaluator`) orchestrated with Docker Compose for one-command reproducibility.

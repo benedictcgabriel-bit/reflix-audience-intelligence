@@ -1,0 +1,33 @@
+{
+  "clustering": {
+    "algorithm": "KMeans",
+    "selected_k": 4,
+    "silhouette_score": 0.3586,
+    "inertia": 15159.47
+  },
+  "cluster_balance": {
+    "counts": {
+      "0": 852,
+      "1": 600,
+      "2": 600,
+      "3": 350
+    },
+    "min_cluster_size": 350,
+    "max_cluster_size": 852
+  },
+  "stability": {
+    "fixed_seed": true,
+    "repeat_consistency": true
+  },
+  "api": {
+    "health_passed": true,
+    "valid_requests_passed": 4
+  },
+  "robustness": {
+    "edge_cases_passed": 10,
+    "edge_cases_total": 10
+  },
+  "reproducibility": {
+    "clean_compose_run": true
+  }
+}

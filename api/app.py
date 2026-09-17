@@ -603,89 +603,46 @@ def serve_ui():
         <div class="text-xs font-semibold uppercase tracking-wider" style="color: var(--warm-peach);">
           AUDIENCE BEHAVIOR PROFILES
         </div>
-        <button type="button" id="toggle-scenarios-btn" onclick="toggleMoreScenarios()"
-                class="text-xs font-medium transition hover:underline cursor-pointer flex-shrink-0" style="color: var(--warm-peach);">
-          More scenarios &darr;
-        </button>
+        <span class="text-[11px]" style="color: var(--vd-text-muted);">Canonical Evaluation Profiles</span>
       </div>
 
-      <!-- Featured Row (4 scenarios) -->
+      <!-- 4 Canonical Benchmark Profiles -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         <button type="button" onclick="applyPreset('01')"
                 style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
                 class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
           <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Action Enthusiast</span>
+            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Action & Thriller</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">01</span>
           </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">High watch &middot; long sessions</span>
+          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">USR-8192 &middot; 32.5h watch &middot; 85m session</span>
         </button>
         <button type="button" onclick="applyPreset('02')"
                 style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
                 class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
           <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Family & Comedy</span>
+            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Comedy & Animation</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">02</span>
           </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Casual &middot; bite-sized sessions</span>
+          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">USR-1044 &middot; 12.0h watch &middot; 35m session</span>
         </button>
         <button type="button" onclick="applyPreset('03')"
                 style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
                 class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
           <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Drama Binger</span>
+            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Drama & Romance</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">03</span>
           </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">High watch &middot; narrative dramas</span>
+          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">USR-2099 &middot; 50.0h watch &middot; 80m session</span>
         </button>
         <button type="button" onclick="applyPreset('04')"
                 style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
                 class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
           <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Sci-Fi & Mystery</span>
+            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Sci-Fi & Horror</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">04</span>
           </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Late-night speculative fiction</span>
-        </button>
-      </div>
-
-      <!-- Additional Row (4 more scenarios, toggled) -->
-      <div id="more-scenarios-row" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 hidden pt-1">
-        <button type="button" onclick="applyPreset('05')"
-                style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
-                class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Casual Weekend</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">05</span>
-          </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Light viewing &middot; occasional</span>
-        </button>
-        <button type="button" onclick="applyPreset('06')"
-                style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
-                class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Genre Explorer</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">06</span>
-          </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Varied genres &middot; active viewing</span>
-        </button>
-        <button type="button" onclick="applyPreset('07')"
-                style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
-                class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Quick-Session</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">07</span>
-          </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Short bursts &middot; snackable</span>
-        </button>
-        <button type="button" onclick="applyPreset('08')"
-                style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);"
-                class="px-3.5 py-2.5 min-h-[52px] text-left rounded-xl hover:border-[#935073] transition group cursor-pointer flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-1">
-            <span class="font-bold text-xs block truncate" style="color: var(--soft-ivory);">Low-Activity</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold" style="background-color: var(--vd-surface-1); color: var(--warm-peach);">08</span>
-          </div>
-          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">Minimal watch &middot; dormant</span>
+          <span class="text-[11px] block mt-0.5 leading-snug" style="color: var(--vd-text-secondary);">USR-5512 &middot; 26.0h watch &middot; 65m session</span>
         </button>
       </div>
     </div>
@@ -702,8 +659,8 @@ def serve_ui():
         <form id="recommend-form" class="space-y-4">
           <div>
             <label class="block text-xs font-medium mb-1.5" style="color: var(--vd-text-secondary);">Viewer Name / Identifier</label>
-            <input id="user_id" type="text" value="Viewer-01" required
-                   placeholder="e.g. Viewer-01 or USR-8192"
+            <input id="user_id" type="text" value="USR-8192" required
+                   placeholder="e.g. USR-8192"
                    style="background-color: var(--vd-surface-input); color: var(--vd-text-primary); border: 1px solid var(--vd-border-accent);"
                    class="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono min-h-[44px] focus:outline-none focus:border-[#935073] transition">
           </div>
@@ -711,13 +668,13 @@ def serve_ui():
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label class="block text-xs font-medium mb-1.5" style="color: var(--vd-text-secondary);">Total Watch (Hours)</label>
-              <input id="watch_time_hours" type="number" step="0.5" min="0" max="1000" value="42.0" required
+              <input id="watch_time_hours" type="number" step="0.5" min="0" max="1000" value="32.5" required
                      style="background-color: var(--vd-surface-input); color: var(--vd-text-primary); border: 1px solid var(--vd-border-accent);"
                      class="w-full px-3.5 py-2.5 rounded-xl text-sm min-h-[44px] focus:outline-none focus:border-[#935073] transition">
             </div>
             <div>
               <label class="block text-xs font-medium mb-1.5" style="color: var(--vd-text-secondary);">Avg Session (Minutes)</label>
-              <input id="avg_session_mins" type="number" step="1.0" min="0" max="1440" value="95.0" required
+              <input id="avg_session_mins" type="number" step="1.0" min="0" max="1440" value="85.0" required
                      style="background-color: var(--vd-surface-input); color: var(--vd-text-primary); border: 1px solid var(--vd-border-accent);"
                      class="w-full px-3.5 py-2.5 rounded-xl text-sm min-h-[44px] focus:outline-none focus:border-[#935073] transition">
             </div>
@@ -748,13 +705,13 @@ def serve_ui():
           <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-accent);" class="rounded-xl p-4 sm:p-5 space-y-2">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
               <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--warm-peach);">Assigned Segment</span>
-              <span id="res-distance" class="text-xs font-mono" style="color: var(--vd-text-muted);">Centroid distance: 1.60</span>
+              <span id="res-distance" class="text-xs font-mono" style="color: var(--vd-text-muted);">Distance to centroid: --</span>
             </div>
             <div id="res-segment-name" class="text-xl sm:text-2xl font-black break-words" style="color: var(--soft-ivory);">
-              High-Engagement Action Viewers
+              Awaiting Analysis
             </div>
             <p id="res-segment-desc" class="text-xs leading-relaxed" style="color: var(--vd-text-secondary);">
-              Users with substantial watch time and long session durations drawn towards action, thrillers, and blockbuster spectacles.
+              Submit viewer signals or select a profile to calculate real-time cluster attribution and recommendations.
             </p>
           </div>
 
@@ -801,27 +758,23 @@ def serve_ui():
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Silhouette</div>
-              <div id="stat-silhouette" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">0.3586</div>
+              <div id="stat-silhouette" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Selected K</div>
-              <div id="stat-k" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">4 Clusters</div>
+              <div id="stat-k" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Total Viewers</div>
-              <div id="stat-size" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">2,402</div>
+              <div id="stat-size" class="text-sm font-mono font-bold mt-0.5" style="color: var(--soft-ivory);">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Evaluator</div>
-              <div id="stat-evaluator" class="text-sm font-mono font-bold mt-0.5 text-emerald-400">10/10 Passed</div>
+              <div id="stat-evaluator" class="text-sm font-mono font-bold mt-0.5 text-emerald-400">--</div>
             </div>
           </div>
           <div id="stat-cluster-sizes" class="text-[11px] font-mono flex flex-wrap items-center gap-1.5 pt-1" style="color: var(--vd-text-secondary);">
-            <span>Cluster Distribution:</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px]" style="background-color: var(--vd-surface-2); color: var(--warm-peach);">0: 852</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px]" style="background-color: var(--vd-surface-2); color: var(--warm-peach);">1: 600</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px]" style="background-color: var(--vd-surface-2); color: var(--warm-peach);">2: 600</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px]" style="background-color: var(--vd-surface-2); color: var(--warm-peach);">3: 350</span>
+            <span class="text-xs" style="color: var(--vd-text-muted);">Fetching cluster distribution from /metrics...</span>
           </div>
         </div>
 
@@ -834,19 +787,19 @@ def serve_ui():
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Trainer</div>
-              <div id="status-trainer" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">Completed</div>
+              <div id="status-trainer" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">ML Model</div>
-              <div id="status-model" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">Loaded</div>
+              <div id="status-model" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">API Service</div>
-              <div id="status-api" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">Online :8000</div>
+              <div id="status-api" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">--</div>
             </div>
             <div style="background-color: var(--vd-surface-2); border: 1px solid var(--vd-border-subtle);" class="p-2.5 rounded-xl">
               <div class="text-[10px] uppercase font-semibold" style="color: var(--vd-text-muted);">Evaluator</div>
-              <div id="status-eval" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">Verified</div>
+              <div id="status-eval" class="text-xs font-mono font-bold mt-0.5 text-emerald-400">--</div>
             </div>
           </div>
           <div class="text-[11px] font-mono flex items-center justify-between pt-1" style="color: var(--vd-text-muted);">
@@ -986,27 +939,11 @@ def serve_ui():
     });
 
     const PRESETS = {
-      "01": { user: "Viewer-01", watch: 42.0, session: 95.0, genres: ["Action", "Thriller"] },
-      "02": { user: "Viewer-02", watch: 14.0, session: 35.0, genres: ["Comedy", "Family", "Animation"] },
-      "03": { user: "Viewer-03", watch: 55.0, session: 110.0, genres: ["Drama", "Romance"] },
-      "04": { user: "Viewer-04", watch: 28.0, session: 70.0, genres: ["Sci-Fi", "Horror", "Thriller"] },
-      "05": { user: "Viewer-05", watch: 6.5, session: 40.0, genres: ["Comedy", "Documentary"] },
-      "06": { user: "Viewer-06", watch: 38.0, session: 60.0, genres: ["Action", "Sci-Fi", "Drama", "Documentary"] },
-      "07": { user: "Viewer-07", watch: 8.0, session: 18.0, genres: ["Animation", "Comedy"] },
-      "08": { user: "Viewer-08", watch: 1.5, session: 15.0, genres: ["Drama"] }
+      "01": { user: "USR-8192", watch: 32.5, session: 85.0, genres: ["Action", "Thriller"] },
+      "02": { user: "USR-1044", watch: 12.0, session: 35.0, genres: ["Comedy", "Animation"] },
+      "03": { user: "USR-2099", watch: 50.0, session: 80.0, genres: ["Drama", "Romance"] },
+      "04": { user: "USR-5512", watch: 26.0, session: 65.0, genres: ["Sci-Fi", "Horror"] }
     };
-
-    function toggleMoreScenarios() {
-      const row = document.getElementById("more-scenarios-row");
-      const btn = document.getElementById("toggle-scenarios-btn");
-      if (row.classList.contains("hidden")) {
-        row.classList.remove("hidden");
-        btn.innerHTML = "Fewer scenarios &uarr;";
-      } else {
-        row.classList.add("hidden");
-        btn.innerHTML = "More scenarios &darr;";
-      }
-    }
 
     function renderGenres() {
       const container = document.getElementById("genres-container");
@@ -1176,6 +1113,12 @@ def serve_ui():
         }
         if (data.robustness && typeof data.robustness.edge_cases_passed === "number") {
           document.getElementById("stat-evaluator").textContent = `${data.robustness.edge_cases_passed}/${data.robustness.edge_cases_total} Passed`;
+          if (data.robustness.edge_cases_passed === data.robustness.edge_cases_total) {
+            document.getElementById("status-eval").textContent = "Verified";
+          }
+        }
+        if (data.reproducibility && data.reproducibility.clean_compose_run) {
+          document.getElementById("status-trainer").textContent = "Completed";
         }
         if (data.cluster_balance && data.cluster_balance.counts) {
           let total = 0;
