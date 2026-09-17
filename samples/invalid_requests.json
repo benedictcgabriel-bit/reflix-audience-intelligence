@@ -1,0 +1,49 @@
+[
+  {
+    "description": "Negative watch time hours",
+    "payload": {
+      "user_id": "USR-ERR-1",
+      "watch_time_hours": -10.0,
+      "top_genres": [
+        "Action"
+      ],
+      "avg_session_mins": 60.0
+    },
+    "expected_status": 422
+  },
+  {
+    "description": "String instead of numeric watch time",
+    "payload": {
+      "user_id": "USR-ERR-2",
+      "watch_time_hours": "thirty-two",
+      "top_genres": [
+        "Comedy"
+      ],
+      "avg_session_mins": 45.0
+    },
+    "expected_status": 422
+  },
+  {
+    "description": "Missing required avg_session_mins",
+    "payload": {
+      "user_id": "USR-ERR-3",
+      "watch_time_hours": 20.0,
+      "top_genres": [
+        "Drama"
+      ]
+    },
+    "expected_status": 422
+  },
+  {
+    "description": "Excessively large session duration exceeding 24 hours",
+    "payload": {
+      "user_id": "USR-ERR-4",
+      "watch_time_hours": 50.0,
+      "top_genres": [
+        "Sci-Fi"
+      ],
+      "avg_session_mins": 999999.0
+    },
+    "expected_status": 422
+  }
+]

@@ -1,0 +1,38 @@
+services:
+  trainer:
+    build: ./trainer
+    user: "root"
+    command: ["sh", "-c", "mkdir -p /models && chown -R appuser:appuser /models && chmod 777 /models && su appuser -s /bin/sh -c 'python train.py'"]
+    volumes:
+      - model_volume:/models
+      - ./data:/data:ro
+
+  api:
+    build: ./api
+    depends_on:
+      trainer:
+        condition: service_completed_successfully
+    volumes:
+      - model_volume:/models:ro
+      - ./results:/results:ro
+      - ./data:/data:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  evaluator:
+    build: ./evaluator
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./results:/results
+      - ./data:/data:ro
+      - model_volume:/models:ro
+
+volumes:
+  model_volume:
