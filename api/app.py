@@ -906,7 +906,7 @@ def serve_ui():
     const overlay = document.getElementById("reflix-intro-overlay");
     const searchWrapper = document.getElementById("search-wrapper");
     const searchInput = document.getElementById("user-search-input");
-    const fullPlaceholderText = "Search movies, shows...";
+    const fullPlaceholderText = "Search viewer name or ID...";
 
     // Determine initial state immediately to avoid any 1-frame visual flash
     if (reflixIntroPlayed || prefersReducedMotion) {
@@ -1043,8 +1043,30 @@ def serve_ui():
     function searchUserProfile() {
       const val = document.getElementById("user-search-input").value.trim();
       if (!val) return;
+      let matchedKey = null;
+      if (PRESETS[val]) {
+        matchedKey = val;
+      } else {
+        for (const [k, p] of Object.entries(PRESETS)) {
+          if (p.user.toLowerCase() === val.toLowerCase()) {
+            matchedKey = k;
+            break;
+          }
+        }
+      }
+      if (matchedKey) {
+        applyPreset(matchedKey);
+        return;
+      }
       document.getElementById("user_id").value = val;
-      document.getElementById("recommend-form").requestSubmit();
+      const watch = document.getElementById("watch_time_hours").value;
+      const session = document.getElementById("avg_session_mins").value;
+      if (!watch || !session) {
+        document.getElementById("watch_time_hours").focus();
+        document.getElementById("recommend-form").scrollIntoView({ behavior: "smooth" });
+      } else {
+        document.getElementById("recommend-form").requestSubmit();
+      }
     }
 
     function openMovieModal(title) {
